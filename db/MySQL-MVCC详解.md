@@ -1,4 +1,4 @@
-# Mysql-MVCC 详解
+# MySQL-MVCC 详解
 
 ## MVCC介绍
 
