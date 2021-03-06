@@ -48,6 +48,44 @@
 
 AVL树的查询性能与树的层级（树高度 h) 成反比，**h值越小查询越快**。通过保证数据的左右边的节点高度相差不大于1，这样避免树形结构的由于**删除、增加导致树变成线性链表**的结构影响了查询效率，保证数据平衡查询速度近似于二分法查找。（为了保证左右端数据大致平衡，降低二叉树的查询难度，一般采用算法机制实现节点的数据结构平衡，如 <a href="">Treap</a>、<a href="">红黑树</a>）
 
+#### 平衡的调整
+
+分为四种情况：LL、LR、RR、RL
+
+下面我们通过不断插入数据来说明几种不同的旋转方式:
+
+<font color="red">注意：橘黄色的结点为旋转中心，黑色结点的为离插入结点最近的失衡结点。</font>
+
+##### LR型
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/LR.png)
+
+最开始插入数据16，3，7后的结构如上图所示，结点16失去了平衡，3为16的左孩子，7为失衡结点的左孩子的右孩子，所以为LR型，接下来通过两次旋转操作复衡，先通过以3为旋转中心，进行左旋转，结果如图所示，然后再以7为旋转中心进行右旋转，旋转后恢复平衡了。
+
+##### LL型
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/LL.png)
+
+在上面恢复平衡后我们再次插入数据11和9,发现又失去平衡了，这次失衡结点是16，11是其左孩子，9为其失衡结点的左孩子的左孩子，所以是LL型，以失衡结点的左孩子为旋转中心进行一次右旋转即可。
+
+##### RR型
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/RR.png)
+
+进一步插入数据26后又再次失衡了，失衡结点为7,很明显这是RR型，以失衡结点的右孩子为旋转中心左旋转一次即可。
+
+##### RL型
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/RL.png)
+
+再插入18后又再次失衡了，失衡结点为16，26为其右孩子，18为其右孩子的左孩子，为RL型，以失衡结点的右孩子为旋转中心，进行一次右旋转，然后再次已失衡结点的右孩子为旋转中心进行一次左旋转变恢复了平衡。
+
+这就是4中旋转方式，其实只有两种，RR和LL，RL和LR本质上是一样的。下面我们再次插入数据14，15，完成我们最后数据的插入操作：
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/LLRR.png)
+
+又是一次LR型，按前面操作就可以了。
+
 ## <span id="b-tree">B-tree</span>
 
 
