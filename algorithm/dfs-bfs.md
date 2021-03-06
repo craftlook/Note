@@ -50,7 +50,7 @@
 
 一直递归下去到最左边的格子，然后左边行不通，走下边。然后达到目标。DFS的重要点在于状态回溯。
 
-7.png)
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/dfs-7.png)
 
 ## BFS（广度优先）
 
