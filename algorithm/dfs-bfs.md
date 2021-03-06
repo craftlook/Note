@@ -11,7 +11,7 @@
 
 复杂度上： DFS与BFS的复杂度大体一致，不同之处在于遍历的方式和对于问题的解决出发点不同，**DFS适用于目标明确**，**BFS适用于大范围的寻找**。(DFS通常是可以知道我们能不能做到某事，而BFS一般还能知道做到某事的最小路径)
 
-## DFS（深度优先）
+## DFS（Depth first search 深度优先）
 
 **深度优先搜索的步骤：**
 
@@ -48,9 +48,30 @@
 
 ![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/dfs-6.png)
 
-一直递归下去到最左边的格子，然后左边行不通，走下边。然后达到目标。DFS的重要点在于状态回溯。
+一直递归下去到最左边的格子，然后左边行不通，走下边。然后达到目标。DFS的重要点在于**状态回溯**。
 
 ![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/dfs-7.png)
 
-## BFS（广度优先）
+## BFS（Breadth first search 广度优先）
 
+广度优先搜索较之深度优先搜索之不同在于，深度优先搜索旨在不管有多少条岔路，先一条路走到底，不成功就返回上一个路口然后就选择下一条岔路，而广度优先搜索旨在面临一个路口时，把所有的岔路口都记下来，然后选择其中一个进入，然后将它的分路情况记录下来，然后再返回来进入另外一个岔路，并重复这样的操作，用图形来表示则是这样的，例子同上
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/bfs-1.png)
+
+从黑色起点出发，记录所有的岔路口，并标记为走一步可以到达的。然后选择其中一个方向走进去，我们走黑点方块上面的那个，然后将这个路口可走的方向记录下来并标记为2，意味走两步可以到达的地方。
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/bfs-2.png)
+
+接下来，我们回到黑色方块右手边的1方块上，并将它能走的方向也记录下来，同样标记为2，因为也是走两步便可到达的地方
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/bfs-3.png)
+
+这样走一步以及走两步可以到达的地方都搜索完毕了，下面同理，我们可以迅速把三步的格子给标记出来
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/bfs-4.png)
+
+再之后是四步，五步。
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/bfs-5.png)
+
+我们便成功寻找到了路径，并且把所有可行的路径都求出来了。在广度优先搜索中，可以看出是逐步求解的，反复的进入与退出，将当前的所有可行解都记录下来，然后逐个去查看。在DFS中我们说关键点是递归以及回溯，在BFS中，关键点则是状态的选取和标记。
