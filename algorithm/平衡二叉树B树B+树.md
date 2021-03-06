@@ -21,7 +21,19 @@
 * 递归方式：递归边界为树的终止节点；
 * 非递归方式：分为 **DFS**（深度优先）和**BFS**（广度优先） 的遍历方式。 <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/algorithm/dfs-bfs.md">DFS与BFS介绍</a>
 
+**DFS** 根据以结点（Node）的访问顺序，定义了三种不同的搜索策略：（**记忆点：**前、中、后 标达的时结点的访问顺序，其中左子树优先右子树遍历）
 
+* 前序遍历：结点 -> 左子树 -> 右子树 
+* 中序遍历：左子树-> 结点 -> 右子树
+* 后续遍历：左子树-> 右子树 -> 结点
+
+如图：
+
+![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/tree-search.png)
+
+* 前序: F - B - A - D - C - E - G - I - H
+* 中序: A - B - C - D - E - F - G - H - I
+* 后序: A - C - E - D - B - H - I - G - F
 
 ## <span id="avg-tree">平衡二叉树</span>(AVL)
 
