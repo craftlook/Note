@@ -1,0 +1,57 @@
+# 将数值数组按一定顺序拼接，使得拼接的结果最大
+
+## 题目
+
+给定一个数值数组，将数组中的数值按照一定顺序拼接在一起，使得拼接的结果值最大。 输出String防止值溢出
+
+e.g. : [123,1,321,3214] , 最大数是 32133211231 。
+
+
+
+## 思路
+
+数组最先考虑到了，元素排序，但是需要保证数值的品接的结果最大。那么以一位数举例，最大值是9。那么只要保证结果的数值每一位都是最大的情况。那么我们要考虑的是数组排序时，对元素的每一位进行比较时需要做出特殊处理，对元素的每一位进行比较，取最大值。
+
+```
+public static String arrayToMaxString1(Integer[] array) {
+        //使用堆排序， 排序时校验规则是本次题的关键，每个int数组中的int元素进行排序，
+        //比较器里的逻辑， int通过转成char[]数组，每个char[] 安位进行比较，
+        // 如 321、312，
+        //第一次比较：3 和 3 相同进行下一步遍历
+        //第二次比较：2 和 1 2>1 代表 321 比321大，返回1
+        // 如 9 、 321
+        // 第一次比较：9 与 3 ，9>3则，9比321靠前
+        Arrays.sort(array, new Comparator<Integer>() {
+            @Override
+            /**
+             *如果返回 1  current > target
+             *如果返回 0  current = target
+             *如果返回 -1 current < current
+             */
+            public int compare(Integer current, Integer target) {
+                String currentStr = String.valueOf(current) + String.valueOf(target);
+                String targetStr = String.valueOf(target) + String.valueOf(current);
+                char[] currentC = String.valueOf(currentStr).toCharArray();
+                char[] targetC = String.valueOf(targetStr).toCharArray();
+                for (int i = 0; i < currentStr.length(); i++) {
+                    // 前几位的遍历
+                    if (currentC[i] > targetC[i]) {// 返回true
+                        return -1;// 传 -1 大的排在数组前面
+                    }
+                    if (currentC[i] < targetC[i]) {// 返回false
+                        return 1;// 传 1 小的排在数组后面
+                    }
+                }
+                return -1;
+            }
+        });
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < array.length; i++) {
+            sb.append(array[i]);
+        }
+        return sb.toString();
+    }
+```
+
+其中 currentStr 和 targetStr ，是 比较元素相加的结果。 currentStr  = A + B,targetStr = B + A。 补全字符串长度避免长度不一致导致比较数据不对的问题。
