@@ -15,7 +15,7 @@
  * 树
    * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/algorithm/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91B%E6%A0%91B%2B%E6%A0%91.md">查询二叉树、平衡二叉树、B树、B+树</a>
 ### 算法题
- * <a href="">leeCode目录</a>
+ * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/leeCode/menu.md">leeCode目录</a>
 
 ## 没用的知识
 ### 股市
