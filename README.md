@@ -18,6 +18,5 @@
  * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/leeCode/menu.md">leeCode目录</a>
 
 ## 没用的知识
-### 股市
-* 财报
-* 认知
+### 失败经验
+* <a href="">汇总</a>
