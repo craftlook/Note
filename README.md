@@ -17,6 +17,6 @@
 ### 算法题
  * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/leeCode/menu.md">leeCode目录</a>
 
-## 没用的知识
-### 失败经验
-* <a href="">汇总</a>
+## 无用经验
+### 回顾
+* <a href="">笔记</a>
