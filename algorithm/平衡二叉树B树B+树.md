@@ -3,7 +3,6 @@
 #### 目录
 
 * [二叉树](#2tree)
-
 * [平衡二叉树](#avg-tree)
 * [B tree](#b-tree)
 * [B+ tree](#b+-tree)
@@ -197,4 +196,21 @@ B*树是B+树的变种，相对于B+树他们的不同之处如下：
 在B+树的基础上因其初始化的容量变大，使得节点空间使用率更高，而又存有兄弟节点的指针，可以向兄弟节点转移关键字的特性使得B*树额分解次数变得更少；
 
 ![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/B++tree.jpg)
+
 ##  <span id="summary">总结</span>
+
+**相同思想和策略**
+
+从平衡二叉树、B树、B+树、B*树总体来看它们的贯彻的思想是相同的，都是采用二分法和数据平衡策略来提升查找数据的速度；
+
+**不同的方式的磁盘空间利用**
+
+不同点是他们一个一个在演变的过程中通过IO从磁盘读取数据的原理进行一步步的演变，每一次演变都是为了让节点的空间更合理的运用起来，从而使树的层级减少达到快速查找数据的目的；
+
+
+
+## 补充
+
+附：[B树和B+树的插入、删除图文详解 - nullzx - 博客园](https://link.zhihu.com/?target=https%3A//www.cnblogs.com/nullzx/p/8729425.html)
+
+附：[数据库磁盘]()
