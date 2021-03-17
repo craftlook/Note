@@ -8,6 +8,7 @@
 * [B tree](#b-tree)
 * [B+ tree](#b+-tree)
 * [B* tree](#bb-tree)
+* [总结](#summary)
 
 ## <span id="2Tree">二叉查找树</span>(BST)
 
@@ -196,4 +197,4 @@ B*树是B+树的变种，相对于B+树他们的不同之处如下：
 在B+树的基础上因其初始化的容量变大，使得节点空间使用率更高，而又存有兄弟节点的指针，可以向兄弟节点转移关键字的特性使得B*树额分解次数变得更少；
 
 ![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/B++tree.jpg)
-
+##  <span id="summary">总结</span>
