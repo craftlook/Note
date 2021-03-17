@@ -213,4 +213,4 @@ B*树是B+树的变种，相对于B+树他们的不同之处如下：
 
 附：[B树和B+树的插入、删除图文详解 - nullzx - 博客园](https://link.zhihu.com/?target=https%3A//www.cnblogs.com/nullzx/p/8729425.html)
 
-附：[数据库磁盘]()
+附：[数据库磁盘](https://blog.csdn.net/idber/article/details/8087473)
