@@ -131,12 +131,10 @@ B树与平衡二叉树不同是，每个节点包含的关键字增多，特别�
   **先插入 3、8、31、11**
 
 ![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree1.jpg)
-
-	   **再插入23、29**
+**再插入23、29**
 
 ![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree2.png)
-
-       **再插入50、28**
+**再插入50、28**
 
 ![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree3.png)
 
