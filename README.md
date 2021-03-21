@@ -20,4 +20,4 @@
 
 ## LightHouse
 ### 回顾
-* <a href="">笔记</a>
+* <a href="https://github.com/craftlook/Note/blob/craftlook-Hello-World/other/menu.md">笔记</a>
