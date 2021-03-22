@@ -21,4 +21,4 @@
 ## LightHouse
 ### 回顾
 * <a href="https://github.com/craftlook/Note/blob/craftlook-Hello-World/other/menu.md">笔记</a>
-* [中国会议]()
+* [中国会议](https://github.com/craftlook/Note/blob/craftlook-Hello-World/other/NationalConference.md)
