@@ -164,4 +164,4 @@ ThreadLocalMap其实就是ThreadLocal的一个**静态内部类**，里面定义
 * ThreadLocal本身并不存储值，它只是作为一个key来让线程从ThreadLocalMap获取value。
 
 ## <span id="3">内存泄漏</span>
-![avatar]()
+![avatar](https://github.com/craftlook/Note/blob/craftlook-Hello-World/image/threadLocal-heap.jpeg)
