@@ -163,5 +163,5 @@
 
 ## <span id="3">思维导图</span>  [返回目录](#menu)
 
-![avatar](https://github.com/craftlook/Note/blob/craftlook-Hello-World/image/other/%E5%9B%BD%E5%AE%B6%E4%BC%9A%E8%AE%AE.png)
-![avatar](https://github.com/craftlook/Note/blob/craftlook-Hello-World/image/other/%E5%9B%BD%E5%AE%B6%E4%BC%9A%E8%AE%AE.jpg)
+![avatar](https://github.com/craftlook/Note/blob/master/image/other/%E5%9B%BD%E5%AE%B6%E4%BC%9A%E8%AE%AE.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/other/%E5%9B%BD%E5%AE%B6%E4%BC%9A%E8%AE%AE.jpg)
