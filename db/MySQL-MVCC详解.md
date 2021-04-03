@@ -64,7 +64,7 @@ MVCC实现通过**版本链**、**undo日志**、**ReadView**来实现的
 
 每次对数据库记录进行改动，都会记录undo日志，每个undo日志都有一个db_roll_pointer属性（insert操作对应的undo日志中没有该属性，因为该记录没有更早的版本）。可以通过undo日志中的db_roll_pointer串联日志，形成一个链表。如图：
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/db_roll_pointer%E6%97%A5%E5%BF%97%E9%93%BE.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/db_roll_pointer%E6%97%A5%E5%BF%97%E9%93%BE.png)
 
 对记录进行每次更新后，都会将旧值放入到undo日志中，随着多次更新，所有的版本都通会被db_roll_pointer属性连接形成一条链表，称之为<font color="red">**版本链**</font>，版本链的头部是该记录的最新值。每个版本中都包含该版本对应的事务ID，在根据ReadView判断版本时会用到。
 
@@ -99,7 +99,7 @@ Read View主要用来做**可见性**的判断，即当某个事务执行快照�
 
 #### 可见性判断（源码）
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/read-view-code.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/read-view-code.png)
 
 * `db_trx_id` < `up_limit_id` || `db_trx_id` == `creator_trx_id`（显示）
   * 如果数据事务ID小于read view中的**最小活跃事务ID**，则可以肯定该数据是在当前事务启之前就已经存在了的,所以可以显示。
