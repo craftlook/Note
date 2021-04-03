@@ -30,7 +30,7 @@
 
 如图：
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/tree-search.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/tree-search.png)
 
 * 前序: F - B - A - D - C - E - G - I - H
 * 中序: A - B - C - D - E - F - G - H - I
@@ -59,31 +59,31 @@ AVL树的查询性能与树的层级（树高度 h) 成反比，**h值越小查�
 
 ##### LR型
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/LR.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/LR.png)
 
 最开始插入数据16，3，7后的结构如上图所示，结点16失去了平衡，3为16的左孩子，7为失衡结点的左孩子的右孩子，所以为LR型，接下来通过两次旋转操作复衡，先通过以3为旋转中心，进行左旋转，结果如图所示，然后再以7为旋转中心进行右旋转，旋转后恢复平衡了。
 
 ##### LL型
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/LL.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/LL.png)
 
 在上面恢复平衡后我们再次插入数据11和9,发现又失去平衡了，这次失衡结点是16，11是其左孩子，9为其失衡结点的左孩子的左孩子，所以是LL型，以失衡结点的左孩子为旋转中心进行一次右旋转即可。
 
 ##### RR型
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/RR.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/RR.png)
 
 进一步插入数据26后又再次失衡了，失衡结点为7,很明显这是RR型，以失衡结点的右孩子为旋转中心左旋转一次即可。
 
 ##### RL型
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/RL.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/RL.png)
 
 再插入18后又再次失衡了，失衡结点为16，26为其右孩子，18为其右孩子的左孩子，为RL型，以失衡结点的右孩子为旋转中心，进行一次右旋转，然后再次已失衡结点的右孩子为旋转中心进行一次左旋转变恢复了平衡。
 
 这就是4中旋转方式，其实只有两种，RR和LL，RL和LR本质上是一样的。下面我们再次插入数据14，15，完成我们最后数据的插入操作：
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/LLRR.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/LLRR.png)
 
 又是一次LR型，按前面操作就可以了。
 
@@ -108,7 +108,7 @@ B树与平衡二叉树不同是，每个节点包含的关键字增多，特别�
 
 最后我们用一个图和一个实际的例子来理解B树（这里为了理解方便我就直接用实际字母的大小来排列C>B>A）
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree.jpg)
+![avatar](https://github.com/craftlook/Note/blob/master/image/btree.jpg)
 
 * **B树的查询流程：**
 
@@ -131,13 +131,13 @@ B树与平衡二叉树不同是，每个节点包含的关键字增多，特别�
 
   **先插入 3、8、31、11**
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree1.jpg)
+![avatar](https://github.com/craftlook/Note/blob/master/image/btree1.jpg)
 **再插入23、29**
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree2.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/btree2.png)
 **再插入50、28**
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree3.png)
+![avatar](https://github.com/craftlook/Note/blob/masterd/image/btree3.png)
 
 * **B树节点的删除**
 
@@ -149,7 +149,7 @@ B树与平衡二叉树不同是，每个节点包含的关键字增多，特别�
 
 3. 关键字数小于二时先从子节点取，子节点没有符合条件时就向向父节点取，取中间值往父节点放；
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/btree4.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/btree4.png)
 
 ## <span id="b+-tree">B+ tree</span>
 
@@ -166,7 +166,7 @@ B+树是B树的升级版，相对于B树，B+更充分的利用了节点空间�
    * Mysql的B+树： 非叶子节点的子节点数=关键字数
    * 非叶节点的关键字数=子节点数-1
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/B+tree.jpg)
+![avatar](https://github.com/craftlook/Note/blob/master/image/B+tree.jpg)
 
 **(MySQL B+树示意图)**
 
@@ -195,7 +195,7 @@ B*树是B+树的变种，相对于B+树他们的不同之处如下：
 
 在B+树的基础上因其初始化的容量变大，使得节点空间使用率更高，而又存有兄弟节点的指针，可以向兄弟节点转移关键字的特性使得B*树额分解次数变得更少；
 
-![avatar](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/image/B++tree.jpg)
+![avatar](https://github.com/craftlook/Note/blob/master/image/B++tree.jpg)
 
 ##  <span id="summary">总结</span>
 
