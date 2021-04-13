@@ -8,8 +8,8 @@
 
 ThreadLocal的作用是为当前线程创建一个副本，如：
 
-```
-public static void main(String[] args) {
+``` java
+    public static void main(String[] args) {
         ThreadLocal l = new ThreadLocal();
         l.set("1");
         ThreadLocal l1 = new ThreadLocal();
@@ -34,7 +34,7 @@ ThreadLocal开始的例子使用的是get和set方法。[如果嫌弃太繁琐�
 
 #### set方法
 
-```
+```java
     public void set(T value) {
         Thread t = Thread.currentThread();
         ThreadLocalMap map = getMap(t);
@@ -49,7 +49,7 @@ ThreadLocal开始的例子使用的是get和set方法。[如果嫌弃太繁琐�
 
 #### getMap 方法
 
-```
+```java
     ThreadLocalMap getMap(Thread t) {
         return t.threadLocals;
     }
@@ -57,7 +57,7 @@ ThreadLocal开始的例子使用的是get和set方法。[如果嫌弃太繁琐�
 
 #### createMap方法
 
-```
+```java
     void createMap(Thread t, T firstValue) {
         t.threadLocals = new ThreadLocalMap(this, firstValue);
     }
@@ -67,26 +67,26 @@ ThreadLocal开始的例子使用的是get和set方法。[如果嫌弃太繁琐�
 
 #### Thread 类中的threadLocals
 
-```
-public class Thread implements Runnable {
+```java
+        public class Thread implements Runnable {
 
-    /* ThreadLocal values pertaining to this thread. This map is maintained
-     * by the ThreadLocal class. */
-    ThreadLocal.ThreadLocalMap threadLocals = null;
+            /* ThreadLocal values pertaining to this thread. This map is maintained
+             * by the ThreadLocal class. */
+            ThreadLocal.ThreadLocalMap threadLocals = null;
 
-    /*
-     * InheritableThreadLocal values pertaining to this thread. This map is
-     * maintained by the InheritableThreadLocal class.
-     */
-    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
-}
+            /*
+             * InheritableThreadLocal values pertaining to this thread. This map is
+             * maintained by the InheritableThreadLocal class.
+             */
+            ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+        }
 
 ```
 
 那么 **ThreadLocalMap**类型的threadLocals是什么呢？
 
-```
-static class ThreadLocalMap {
+```java
+    static class ThreadLocalMap {
 
         /**
          * The entries in this hash map extend WeakReference, using
@@ -115,7 +115,7 @@ static class ThreadLocalMap {
             // threadLocal 做key，value做值
         }
         .......
-}
+    }
 ```
 
 从代码中可以看出
@@ -124,7 +124,7 @@ ThreadLocalMap其实就是ThreadLocal的一个**静态内部类**，里面定义
 
 ### get方法分析
 
- ```
+ ```java
     public T get() {
         Thread t = Thread.currentThread();
         ThreadLocalMap map = getMap(t);
@@ -144,7 +144,7 @@ ThreadLocalMap其实就是ThreadLocal的一个**静态内部类**，里面定义
 
 ### **remove方法**
 
-```
+```java
      public void remove() {
          ThreadLocalMap m = getMap(Thread.currentThread());
          if (m != null)
