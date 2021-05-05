@@ -1,7 +1,7 @@
 # 笔记
 
 ### JAVA基础
-* [软件设计七大原则]()
+* [软件设计七大原则](https://github.com/craftlook/Note/blob/master/base/software-principles.md)
 * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/base/JAVA%E6%8B%86%E7%AE%B1%E8%A3%85%E7%AE%B1.md">拆箱装箱</a>
 * [ThreadLocal介绍](https://github.com/craftlook/Note/blob/craftlook-Hello-World/base/threadLoacl.md)
 * [引用介绍](https://github.com/craftlook/Note/blob/craftlook-Hello-World/base/reference.md)
