@@ -137,7 +137,7 @@ B树与平衡二叉树不同是，每个节点包含的关键字增多，特别�
 ![avatar](https://github.com/craftlook/Note/blob/master/image/btree2.png)
 **再插入50、28**
 
-![avatar](https://github.com/craftlook/Note/blob/masterd/image/btree3.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/btree3.png)
 
 * **B树节点的删除**
 
