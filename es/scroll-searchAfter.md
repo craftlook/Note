@@ -60,13 +60,12 @@ GET order/_search
     ]
 }
 ```
+ps: 当我们使用search_after时，**from值必须设置为0或者-1**
 
 上面的语句翻译成sql：
 
 ```sql
 select * from order where orderId>124648691 and _id<"624812_124648691" order by orderId asc,_id desc limit 10
 ```
-
-ps: 当我们使用search_after时，**from值必须设置为0或者-1**
 
 **场景：** search_after缺点是不能够随机跳转分页，只能一页一页的翻页，并且需要至少指定一个唯一不重复字段来排序。它与滚动API非常相似，但与它不同，**search_after参数是无状态的，它始终针对最新版本的搜索器进行解析。因此，排序顺序可能会在步行期间发生变化，具体取决于索引的更新和删除。** 非常多页的查询时，search after是一个常量查询延迟和开销，并无什么副作用。
