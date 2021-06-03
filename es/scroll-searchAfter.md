@@ -11,7 +11,7 @@ ES中 from/size、scroll、search after介绍
 
 ES 可以使用from/size的参数对结果进行分页查询
 
-**原理：**在from+size的查询时，coordinate node（协调节点）向目标index对应的shards发送同样的请求，每个shard取出 from+size 条数据，等汇总 shard*（from+size）条数时coordinate node再做一次排序，取最后的size条数据作为结果返回。
+**原理：** 在from+size的查询时，coordinate node（协调节点）向目标index对应的shards发送同样的请求，每个shard取出 from+size 条数据，等汇总 shard*（from+size）条数时coordinate node再做一次排序，取最后的size条数据作为结果返回。
 
 eg：from=10000，size=10时 es会从每个分片取出（10000+10）条记录，如果有10个分片，则总共要取出（10000+10）*10条数据，协调节点再内存中对这些数据进行排序，最终返回10条数据。这种方式会耗费大量的系统资源，包括时间和空间。
 
