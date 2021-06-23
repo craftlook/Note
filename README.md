@@ -6,6 +6,7 @@
 * [ThreadLocal介绍](https://github.com/craftlook/Note/blob/craftlook-Hello-World/base/threadLoacl.md)
 * [引用介绍](https://github.com/craftlook/Note/blob/master/base/reference.md)
 * [系统各项指标阈值建议值]()
+* [线上中间件规格](https://github.com/craftlook/Note/blob/master/base/dog.md)
 ### 数据库相关
 * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95%E4%B8%8E%E9%9D%9E%E8%81%9A%E7%B0%87%E7%B4%A2%E5%BC%95.md">聚簇索引与非聚簇索引</a>
 * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E5%8F%8A%E9%94%81.md">MySQL 隔离级别、锁、死锁问题</a>
