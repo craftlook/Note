@@ -30,3 +30,12 @@
 * 磁盘 120GB SATA SSD * 2 + 800GB SATA SSD * 6
 * CPU  物理核心 8C * 2 逻辑核心 16C * 2
 * 网卡 10G * 2
+
+#### JimDB
+
+**主订单分片**
+
+* 10G 内存
+* 磁盘 120GB SATA SSD * 2 + 800GB SATA SSD * 6 公用
+* CPU  物理核心 8C * 2 逻辑核心 16C * 2 公用
+* 网卡 10G * 2 公用
