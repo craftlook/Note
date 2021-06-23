@@ -32,7 +32,9 @@
 * 网卡 10G * 2
 
 **JED**
-* 啊发生的
+![image](https://user-images.githubusercontent.com/17558555/123053737-c8602a00-d436-11eb-9c92-bb2d25fd82dc.png)
+8	一主两从	24	192	768GB	12.3T
+6144C	24576GB	393.6T
 #### JimDB
 
 **主订单512分片**
