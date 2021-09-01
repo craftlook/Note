@@ -29,6 +29,11 @@
  * [LSM树](https://github.com/craftlook/Note/blob/master/algorithm/lsm.md)
 ### 算法题
  * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/leeCode/menu.md">leeCode目录</a>
+### 集群注册中心
+ * [注册中心算法]()
+ * [zookeeper]()
+ * [rocketMQ-NameServer]()
+ * [ES-Zen-discovery]()
 
 ## LightHouse
 ### 回顾
