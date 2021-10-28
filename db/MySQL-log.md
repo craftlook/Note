@@ -8,4 +8,5 @@ MySQL Innodb中跟数据持久性、一致性有关的日志，有以下几种�
 - Bin Log:是mysql服务层产生的日志，常用来进行数据恢复、数据库复制，常见的mysql主从架构，就是采用slave同步master的binlog实现的
 - Redo Log:记录了数据操作在物理层面的修改，mysql中使用了大量缓存，修改操作时会直接修改内存，而不是立刻修改磁盘，事务进行中时会不断的产生redo log，在事务提交时进行一次flush操作，保存到磁盘中。当数据库或主机失效重启时，会根据redo log进行数据的恢复，如果redo log中有事务提交，则进行事务提交修改数据。
 - Undo Log: 除了记录redo log外，当进行数据修改时还会记录undo log，undo log用于数据的撤回操作，它记录了修改的反向操作，比如，插入对应删除，修改对应修改为原来的数据，通过undo log可以实现事务回滚，并且可以根据undo log回溯到某个特定的版本的数据，实现MVCC
-- Relay Log: 
+- Relay Log: 中继日志，一般情况下它在MySQL主从同步读写分离集群的从节点才开启。主节点一般不需要这个日志。master主节点的binlog传到slave从节点后，被写道relay log里，从节点的slave sql线程从relaylog里读取日志然后应用到slave从节点本地。从服务器I/O线程将主服务器的二进制日志读取过来记录到从服务器本地文件，然后SQL线程会读取relay-log日志的内容并应用到从服务器，从而使从服务器和主服务器的数据保持一致。
+  它的作用可以参考如下图，从图片中可以看出，它是一个中介临时的日志文件，用于存储从master节点同步过来的binlog日志内容，它里面的内容和master节点的binlog日志里面的内容是一致的。然后slave从节点从这个relaylog日志文件中读取数据应用到数据库中，来实现数据的主从复制 ![avartar](https://github.com/craftlook/Note/blob/master/image/db/relay-log.png)
