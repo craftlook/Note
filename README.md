@@ -18,10 +18,10 @@
 * [MySQL-日志文件介绍](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-log.md)
 
 ### ES相关
- * [ES 组合查询语句介绍](https://github.com/craftlook/Note/blob/master/es/statement.md)
- * [range 查询原理](https://github.com/craftlook/Note/blob/master/es/range.md)
- * [from+size/scroll/search after介绍](https://github.com/craftlook/Note/blob/master/es/scroll-searchAfter.md)
- * [ES 使用场景](https://github.com/craftlook/Note/blob/master/es/ES-dog.md)
+ * [ES 组合查询语句介绍](https://github.com/craftlook/Note/tree/master/es/statement.md)
+ * [range 查询原理](https://github.com/craftlook/Note/tree/master/es/range.md)
+ * [from+size/scroll/search after介绍](https://github.com/craftlook/Note/tree/master/es/scroll-searchAfter.md)
+ * [ES 使用场景](https://github.com/craftlook/Note/tree/master/es/ES-dog.md)
 ### 算法相关
  * [时间与空间复杂度](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/algorithm/%E6%97%B6%E9%97%B4%E4%B8%8E%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6.md)
  * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/algorithm/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE.md">二分查找</a>
