@@ -34,3 +34,5 @@ A在柜台购买多次的包包，有了店里大部分柜姐的联系方式。�
 
 A有事情没有精力关注包包，于是雇佣B就全权负责购买，直到B购买完送到A的手上。
 ![avatar](https://github.com/craftlook/Note/blob/master/image/io/a-io.png)
+#### IO模型对比
+![avatar](https://github.com/craftlook/Note/blob/master/image/io/c-io.png)
