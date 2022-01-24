@@ -1,4 +1,28 @@
 # I/O原理及几种零拷贝机制的实现
+* [I/O原理及几种零拷贝机制的实现](#io原理及几种零拷贝机制的实现)
+  * [一、内存分类](#一、内存分类)
+    * [物理内存](#物理内存)
+    * [虚拟内存](#虚拟内存)
+    * [页表](#页表)
+    * [用户进程申请访问内存过程](#用户进程申请访问内存过程)
+    * [虚拟内存优点](#虚拟内存优点)
+  * [二、系统空间](#二、系统空间)
+    * [内核空间](#内核空间)
+    * [用户空间](#用户空间)
+  * [三、内部层级结构](#三、内部层级结构)
+  * [四、Linux I/O读写方式](#四、linux-io读写方式)
+    * [中断原理](#中断原理)
+    * [DMA传输原理](#dma传输原理)
+  * [五、IO方式](#五、io方式)
+    * [传统I/O方式](#传统io方式)
+    * [Linux零拷贝](#linux零拷贝)
+      * [Linux-用户态直接I/O（跳过内核缓存区，自己管理I/O缓存区）](#linux-用户态直接io（跳过内核缓存区，自己管理io缓存区）)
+      * [Linux-内存映射（mmap+write）](#linux-内存映射（mmapwrite）)
+      * [Linux-sendfile](#linux-sendfile)
+      * [Linux-sendfile + DMA gather copy](#linux-sendfile--dma-gather-copy)
+      * [Linux-splice](#linux-splice)
+      * [Linux 零拷贝对比](#linux-零拷贝对比)
+    * [Java NIO 零拷贝](#java-nio-零拷贝)
 
 [TOC] 
 
