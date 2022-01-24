@@ -25,7 +25,7 @@
       - [Linux 零拷贝对比](#linux------)
     + [Java NIO 零拷贝](#java-nio----)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+[TOC] 
 
 
 
