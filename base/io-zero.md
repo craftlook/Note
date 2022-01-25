@@ -1,3 +1,5 @@
+# Table of Contents
+
 * [I/O原理及几种零拷贝机制的实现](#io原理及几种零拷贝机制的实现)
   * [一、内存分类](#一、内存分类)
     * [物理内存](#物理内存)
@@ -26,6 +28,33 @@
       * [5.2.6 写时复制](#526-写时复制)
       * [5.2.7 缓冲区共享](#527-缓冲区共享)
       * [5.2.8 Linux 零拷贝对比](#528-linux-零拷贝对比)
+    * [Java NIO 零拷贝](#java-nio-零拷贝)
+
+
+# I/O原理及几种零拷贝机制的实现
+* [I/O原理及几种零拷贝机制的实现](#io原理及几种零拷贝机制的实现)
+  * [一、内存分类](#一、内存分类)
+    * [物理内存](#物理内存)
+    * [虚拟内存](#虚拟内存)
+    * [页表](#页表)
+    * [用户进程申请访问内存过程](#用户进程申请访问内存过程)
+    * [虚拟内存优点](#虚拟内存优点)
+  * [二、系统空间](#二、系统空间)
+    * [内核空间](#内核空间)
+    * [用户空间](#用户空间)
+  * [三、内部层级结构](#三、内部层级结构)
+  * [四、Linux I/O读写方式](#四、linux-io读写方式)
+    * [中断原理](#中断原理)
+    * [DMA传输原理](#dma传输原理)
+  * [五、IO方式](#五、io方式)
+    * [传统I/O方式](#传统io方式)
+    * [Linux零拷贝](#linux零拷贝)
+      * [Linux-用户态直接I/O（跳过内核缓存区，自己管理I/O缓存区）](#linux-用户态直接io（跳过内核缓存区，自己管理io缓存区）)
+      * [Linux-内存映射（mmap+write）](#linux-内存映射（mmapwrite）)
+      * [Linux-sendfile](#linux-sendfile)
+      * [Linux-sendfile + DMA gather copy](#linux-sendfile--dma-gather-copy)
+      * [Linux-splice](#linux-splice)
+      * [Linux 零拷贝对比](#linux-零拷贝对比)
     * [Java NIO 零拷贝](#java-nio-零拷贝)
 
 [TOC] 
@@ -91,7 +120,7 @@
 
 内核进程和用户进程所占的虚拟内存比例是 1:3，Linux x86_32 系统的寻址空间（虚拟存储空间）为 4G（2的32次方），将最高的 **1G 的字节（从虚拟地址 0xC0000000 到 0xFFFFFFFF）供内核进程使用，称为内核空间**；而较低的 **3G 的字节（从虚拟地址 0x00000000 到 0xBFFFFFFF），供各个用户进程使用，称为用户空间**。下图是一个进程的用户空间和内核空间的内存布局：
 
-![avatar]()
+<img src="https://github.com/craftlook/Note/blob/master/image/io/neicun.png" width="80%" heigth="60%"/>
 
 ### 内核空间
 
@@ -115,7 +144,7 @@
 
 内核态可以执行任意命令，调用系统的一切资源，而用户态只能执行简单的运算，不能直接调用系统资源。用户态必须通过系统接口（System Call），才能向内核发出指令。比如，当用户进程启动一个 bash 时，它会通过 getpid() 对内核的 pid 服务发起系统调用，获取当前用户进程的 ID；当用户进程通过 cat 命令查看主机配置时，它会对内核的文件子系统发起系统调用。
 
-![avatar]()
+<img src="https://github.com/craftlook/Note/blob/master/image/io/strust-inner.png" width="80%" heigth="60%"/>
 
 - 内核空间可以访问所有的 CPU 指令和所有的内存空间、I/O 空间和硬件设备。
 - 用户空间只能访问受限的资源，如果需要特殊权限，可以通过系统调用获取相应的资源。
@@ -126,7 +155,7 @@
 
 有了用户空间和内核空间的划分后，Linux 内部层级结构可以分为三部分，从最底层到最上层依次是硬件、内核空间和用户空间，如下图所示：
 
-![avatar]()
+<img src="https://github.com/craftlook/Note/blob/master/image/io/strust.png" width="80%" heigth="60%"/>
 
 ## 四、Linux I/O读写方式
 
