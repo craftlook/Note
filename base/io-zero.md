@@ -54,7 +54,7 @@
 
 **虚拟内存和物理内存就是通过这个页表实现地址空间的映射的**。下面给出两个进程 A、B 各自的虚拟内存空间以及对应的物理内存之间的地址映射示意图：
 
-![Alt](https://github.com/craftlook/Note/blob/master/image/io/addr.png)
+![avatar](https://github.com/craftlook/Note/blob/master/image/io/addr.png# =100x100)
 
 当进程执行一个程序时，需要先从先内存中读取该进程的指令，然后执行，获取指令时用到的就是虚拟地址。这个虚拟地址是程序链接时确定的（内核加载并初始化进程时会调整动态库的地址范围）。为了获取到实际的数据，CPU 需要将虚拟地址转换成物理地址，CPU 转换地址时需要用到进程的页表（Page Table），而页表（Page Table）里面的数据由操作系统维护。
 
