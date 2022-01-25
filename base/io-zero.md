@@ -135,7 +135,7 @@ Linux 提供了**轮询、I/O 中断以及 DMA **传输这 3 种磁盘与主存�
 ### 中断原理
 
 在 DMA 技术出现之前，应用程序与磁盘之间的 I/O 操作都是通过 CPU 的中断完成的。每次用户进程读取磁盘数据时，都需要 CPU 中断，然后发起 I/O 请求等待数据读取和拷贝完成，每次的 I/O 中断都导致 CPU 的上下文切换。
-
+<img src="https://github.com/craftlook/Note/blob/master/image/io/read-liucheng.png" width="60%" heigth="50%"/>
 ![avatar](https://github.com/craftlook/Note/blob/master/image/io/read-liucheng.png)
 
 ### DMA传输原理
