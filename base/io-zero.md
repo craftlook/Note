@@ -347,7 +347,7 @@ splice 系统调用可以在**内核空间的读缓冲区（read buffer）和网
 
 **fbuf 的思想**是每个进程都维护着一个缓冲区池，这个缓冲区池能被同时映射到用户空间（user space）和内核态（kernel space），内核和用户共享这个缓冲区池，这样就避免了一系列的拷贝操作。
 
-<img src="https://github.com/craftlook/Note/blob/master/image/io/write-io-copy.png" width="80%" heigth="60%"/>
+<img src="https://github.com/craftlook/Note/blob/master/image/io/writ-io-copy.png" width="80%" heigth="60%"/>
 
 缓冲区共享的难度在于管理共享缓冲区池需要应用程序、网络软件以及设备驱动程序之间的紧密合作，而且如何改写 API 目前还处于试验阶段并不成熟。
 
