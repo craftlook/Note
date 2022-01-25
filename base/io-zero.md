@@ -1,4 +1,3 @@
-# I/O原理及几种零拷贝机制的实现
 * [I/O原理及几种零拷贝机制的实现](#io原理及几种零拷贝机制的实现)
   * [一、内存分类](#一、内存分类)
     * [物理内存](#物理内存)
@@ -14,14 +13,19 @@
     * [中断原理](#中断原理)
     * [DMA传输原理](#dma传输原理)
   * [五、IO方式](#五、io方式)
-    * [传统I/O方式](#传统io方式)
-    * [Linux零拷贝](#linux零拷贝)
-      * [Linux-用户态直接I/O（跳过内核缓存区，自己管理I/O缓存区）](#linux-用户态直接io（跳过内核缓存区，自己管理io缓存区）)
-      * [Linux-内存映射（mmap+write）](#linux-内存映射（mmapwrite）)
-      * [Linux-sendfile](#linux-sendfile)
-      * [Linux-sendfile + DMA gather copy](#linux-sendfile--dma-gather-copy)
-      * [Linux-splice](#linux-splice)
-      * [Linux 零拷贝对比](#linux-零拷贝对比)
+    * [5.1 传统I/O方式](#51-传统io方式)
+      * [5.1.1 传统IO 读](#511-传统io-读)
+      * [5.1.2 传统IO 写](#512-传统io-写)
+    * [5.2 Linux零拷贝](#52-linux零拷贝)
+      * [5.2.1 Linux-用户态直接I/O（跳过内核缓存区，自己管理I/O缓存区）](#521-linux-用户态直接io（跳过内核缓存区，自己管理io缓存区）)
+      * [磁盘IO和网路IO延迟](#磁盘io和网路io延迟)
+      * [5.2.2 Linux-内存映射（mmap+write）](#522-linux-内存映射（mmapwrite）)
+      * [5.2.3 Linux-sendfile](#523-linux-sendfile)
+      * [5.2.4 Linux-sendfile + DMA gather copy](#524-linux-sendfile--dma-gather-copy)
+      * [5.2.5 Linux-splice](#525-linux-splice)
+      * [5.2.6 写时复制](#526-写时复制)
+      * [5.2.7 缓冲区共享](#527-缓冲区共享)
+      * [5.2.8 Linux 零拷贝对比](#528-linux-零拷贝对比)
     * [Java NIO 零拷贝](#java-nio-零拷贝)
 
 [TOC] 
@@ -352,6 +356,18 @@ splice 系统调用可以在**内核空间的读缓冲区（read buffer）和网
 缓冲区共享的难度在于管理共享缓冲区池需要应用程序、网络软件以及设备驱动程序之间的紧密合作，而且如何改写 API 目前还处于试验阶段并不成熟。
 
 #### 5.2.8 Linux 零拷贝对比
+
+无论是传统 I/O 拷贝方式还是引入零拷贝的方式，2 次 DMA Copy 是都少不了的，因为两次 DMA 都是依赖硬件完成的。下面从 CPU 拷贝次数、DMA 拷贝次数以及系统调用几个方面总结一下上述几种 I/O 拷贝方式的差别。
+
+| 拷贝方式                 | 系统调用   | CPU拷贝 | DMA拷贝 | 上下文切换 |
+| ------------------------ | ---------- | ------- | ------- | ---------- |
+| 传统I/O（read+write）    | read+write | 2       | 2       | 4          |
+| 内存映射（mmap+write）   | mmap+write | 1       | 2       | 4          |
+| sendfile                 | sendfile   | 1       | 2       | 2          |
+| sendfile+DMA gather copy | sendfile   | 1       | 2       | 2          |
+| splice                   | splice     | 0       | 2       | 2          |
+
+
 
 ### Java NIO 零拷贝
 
