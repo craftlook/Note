@@ -151,21 +151,205 @@ DMA 的全称叫直接内存存取（Direct Memory Access），是一种允许�
 
 <img src="https://github.com/craftlook/Note/blob/master/image/io/read-dma.png" width="80%" heigth="60%"/>
 
+有了 **DMA 磁盘控制器接管数据读写请求以后，CPU 从繁重的 I/O 操作中解脱。CPU既不停止主程序的运行，也不进入等待状态，是一种高效率的工作方式**，数据读取操作的流程如下：
+
+1. 用户进程向 CPU 发起 read 系统调用读取数据，由用户态切换为内核态，然后一直阻塞等待数据的返回。
+2. CPU 在接收到指令以后对 DMA 磁盘控制器发起调度指令。
+3. DMA 磁盘控制器对磁盘发起 I/O 请求，将磁盘数据先放入磁盘控制器缓冲区，**CPU 全程不参与此过程**。
+4. 数据读取完成后，DMA 磁盘控制器会接受到磁盘的通知，将数据从磁盘控制器缓冲区拷贝到内核缓冲区。
+5. DMA 磁盘控制器向 CPU 发出数据读完的信号，由 CPU 负责将数据从内核缓冲区拷贝到用户缓冲区。
+6. 用户进程由内核态切换回用户态，解除阻塞状态，然后等待 CPU 的下一个执行时间钟。
+
 ## 五、IO方式
 
 ### 传统I/O方式
 
+为了更好的理解零拷贝解决的问题，我们首先了解一下传统 I/O 方式存在的问题。在 Linux 系统中，传统的访问方式是通过 write() 和 read() 两个系统调用实现的，通过 read() 函数读取文件到到缓存区中，然后通过 write() 方法把缓存中的数据输出到网络端口，伪代码如下：
+
+```cpp
+read(file_fd, tmp_buf, len);
+write(socket_fd, tmp_buf, len);
+```
+
+下图分别对应传统 I/O 操作的数据读写流程，整个过程涉及**2 次 CPU 拷贝、2 次 DMA 拷贝总共 4 次拷贝 **，以及 4 次上下文切换，下面简单地阐述一下相关的概念。
+
+<img src="https://github.com/craftlook/Note/blob/master/image/io/tradition-io.png" width="80%" heigth="60%"/>
+
+- **上下文切换**：当用户程序向内核发起系统调用时，CPU 将用户进程从用户态切换到内核态；当系统调用返回时，CPU 将用户进程从内核态切换回用户态。
+- **CPU拷贝**：由 CPU 直接处理数据的传送，数据拷贝时会一直占用 CPU 的资源。
+- **DMA拷贝**：由 CPU 向DMA磁盘控制器下达指令，让 DMA 控制器来处理数据的传送，数据传送完毕再把信息反馈给 CPU，从而减轻了 CPU 资源的占有率。
+
+#### 传统IO 读 
+
+当应用程序执行 read 系统调用读取一块数据的时候，如果**这块数据已经存在于用户进程的页内存中，就直接从内存中读取数据**；如果**数据不存在，则先将数据从磁盘加载数据到内核空间的读缓存（read buffer）中，再从读缓存拷贝到用户进程的页内存中**。
+
+```cpp
+read(file_fd, tmp_buf, len);
+```
+
+基于传统的 I/O 读取方式，**read 系统调用会触发 2 次上下文切换，1 次 DMA 拷贝和 1 次 CPU 拷贝**，发起数据读取的流程如下：
+
+1. 用户进程通过 read() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
+2. CPU利用DMA控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
+3. CPU将读缓冲区（read buffer）中的数据拷贝到用户空间（user space）的用户缓冲区（user buffer）。
+4. 上下文从内核态（kernel space）切换回用户态（user space），read 调用执行返回。
+
+#### 传统IO 写
+
+当应用程序准备好数据，执行 write 系统调用发送网络数据时，先将数据从用户空间的页缓存拷贝到内核空间的网络缓冲区（socket buffer）中，然后再将写缓存中的数据拷贝到网卡设备完成数据发送。
+
+```cpp
+write(socket_fd, tmp_buf, len);
+```
+
+基于传统的 I/O 写入方式，write() 系统调用会触发** 2 次上下文切换，1 次 CPU 拷贝和 1 次 DMA 拷贝**，用户程序发送网络数据的流程如下：
+
+1. 用户进程通过 write() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
+2. CPU 将用户缓冲区（user buffer）中的数据拷贝到内核空间（kernel space）的网络缓冲区（socket buffer）。
+3. CPU 利用 DMA 控制器将数据从网络缓冲区（socket buffer）拷贝到网卡进行数据传输。
+4. 上下文从内核态（kernel space）切换回用户态（user space），write 系统调用执行返回。
+
 ### Linux零拷贝
+
+在 Linux 中零拷贝技术主要有 3 个实现思路：**用户态直接 I/O、减少数据拷贝次数以及写时复制技术**。
+
+- **用户态直接 I/O**：应用程序可以直接访问硬件存储，操作系统内核只是辅助数据传输。这种方式依旧存在用户空间和内核空间的上下文切换，硬件上的数据直接拷贝至了用户空间，不经过内核空间。因此，直接 I/O 不存在内核空间缓冲区和用户空间缓冲区之间的数据拷贝。
+- **减少数据拷贝次数**：在数据传输过程中，避免数据在用户空间缓冲区和系统内核空间缓冲区之间的CPU拷贝，以及数据在系统内核空间内的CPU拷贝，这也是当前主流零拷贝技术的实现思路。
+- **写时复制技术**：写时复制指的是当多个进程共享同一块数据时，如果其中一个进程需要对这份数据进行修改，那么将其拷贝到自己的进程地址空间中，如果只是数据读取操作则不需要进行拷贝操作。
 
 #### Linux-用户态直接I/O（跳过内核缓存区，自己管理I/O缓存区）
 
+用户态直接 I/O 使得应用进程或运行在用户态（user space）下的库函数直接访问硬件设备，数据直接跨过内核进行传输，内核在数据传输过程除了进行必要的虚拟存储配置工作之外，不参与任何其他工作，这种方式能够直接绕过内核，极大提高了性能。如图：
+
+<img src="https://github.com/craftlook/Note/blob/master/image/io/direct-io.png" width="80%" heigth="60%"/>
+
+* 用户态直接 I/O 就是**应用程序直接访问磁盘数据，而不经过内核缓冲区**，这样做的目的是**减少一次内核缓冲区到用户程序缓存的数据复制**。比如说 **数据库管理系统这类应用，他们更倾向于选择他们自己的缓存机制**，因为数据库管理系统往往比操作系统更了解数据库中存在的数据，数据库管理系统可以提供一种更加有效的缓存机制来提高数据库中数据的存取性能。
+
+* 直接IO的缺点：如果**访问的数据不在应用程序缓存中，那么每次数据都会直接从磁盘加载，这种加载会非常缓慢**。通常 直接IO与异步IO结合使用，会得到比较好的性能。
+
+  **异步IO**：当访问数据的线程发出请求后，线程接着去处理其他事，而不是阻塞等待；
+
+  
+
+  #### 磁盘IO和网路IO延迟
+
+  * **磁盘IO主要的延时**是由（以15000rpm硬盘为例）： 机械转动延时（机械磁盘的主要性能瓶颈，平均为2ms） + 寻址延时（2~3ms） + 块传输延时（一般4k每块，40m/s的传输速度，延时一般为0.1ms) 决定。（平均为5ms）
+
+  * **网络IO主要延时**由： 服务器响应延时 + 带宽限制 + 网络延时 + 跳转路由延时 + 本地接收延时 决定。（一般为几十到几千毫秒，受环境干扰极大）
+
 #### Linux-内存映射（mmap+write）
+
+一种零拷贝方式是使用 mmap + write 代替原来的 read + write 方式，减少了 1 次 CPU 拷贝操作。mmap 是 Linux 提供的一种**内存映射文件方法**，即**将一个进程的地址空间中的一段虚拟地址映射到磁盘文件地址**，mmap + write 的伪代码如下：
+
+```cpp
+tmp_buf = mmap(file_fd, len);
+write(socket_fd, tmp_buf, len);
+```
+
+使用 mmap 的目的是**将内核中读缓冲区（read buffer）的地址与用户空间的缓冲区（user buffer）进行映射**，从而实现内核缓冲区与应用程序内存的共享，**省去了将数据从内核读缓冲区（read buffer）拷贝到用户缓冲区（user buffer）的过程**，然而内核读缓冲区（read buffer）仍需将数据到内核写缓冲区（socket buffer），大致的流程如下图所示：
+
+<img src="https://github.com/craftlook/Note/blob/master/image/io/mmap-io.png" width="80%" heigth="60%"/>
+
+基于 mmap + write 系统调用的零拷贝方式，整个拷贝过程会发生 **4 次上下文切换，1 次 CPU 拷贝和 2 次 DMA 拷贝**，用户程序读写数据的流程如下：
+
+1. 用户进程通过 mmap() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
+2. 将用户进程的内核空间的读缓冲区（read buffer）与用户空间的缓存区（user buffer）进行内存地址映射。
+3. CPU利用DMA控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
+4. 上下文从内核态（kernel space）切换回用户态（user space），mmap 系统调用执行返回。
+5. 用户进程通过 write() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
+6. CPU将读缓冲区（read buffer）中的数据拷贝到的网络缓冲区（socket buffer）。
+7. CPU利用DMA控制器将数据从网络缓冲区（socket buffer）拷贝到网卡进行数据传输。
+8. 上下文从内核态（kernel space）切换回用户态（user space），write 系统调用执行返回。
+
+mmap 主要的用处是**提高 I/O 性能，特别是针对大文件**。**对于小文件，内存映射文件反而会导致碎片空间的浪费**，因为内存映射总是要对齐页边界，最小单位是 4 KB，一个 5 KB 的文件将会映射占用 8 KB 内存，也就会浪费 3 KB 内存。
+
+mmap 的拷贝虽然减少了 1 次拷贝，提升了效率，
+
+* 但也存在一些隐藏的问题：**当 mmap 一个文件时，如果这个文件被另一个进程所截获**，那么 write 系统调用会因为访问非法地址被 SIGBUS 信号终止，**SIGBUS 默认会杀死进程并产生一个 coredump，服务器可能因此被终止**。
 
 #### Linux-sendfile
 
+sendfile 系统调用在 Linux 内核版本 2.1 中被引入，目的是简化通过网络在两个通道之间进行的数据传输过程。sendfile 系统调用的引入，不仅减少了 CPU 拷贝的次数，还减少了上下文切换的次数，它的伪代码如下：
+
+```cpp
+sendfile(socket_fd, file_fd, len);
+```
+
+通过 sendfile 系统调用，数据可以直接在内核空间内部进行 I/O 传输，从而省去了数据在用户空间和内核空间之间的来回拷贝。与 mmap 内存映射方式不同的是， sendfile 调用中 I/O 数据对用户空间是完全不可见的。也就是说，这是一次完全意义上的数据传输过程。（sendfile系统调用在两个文件描述符之间直接传递数据(完全在内核中操作)，从而避免了数据在内核缓冲区和用户缓冲区之间的拷贝，操作效率很高，被称之为零拷贝。）
+
+<img src="https://github.com/craftlook/Note/blob/master/image/io/sendfile-io.png" width="80%" heigth="60%"/>
+
+基于 sendfile 系统调用的零拷贝方式，整个拷贝过程会发生 **2 次上下文切换，1 次 CPU 拷贝和 2 次 DMA 拷贝**，用户程序读写数据的流程如下：
+
+1. 用户进程通过 sendfile() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
+2. CPU 利用 DMA 控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
+3. CPU 将读缓冲区（read buffer）中的数据拷贝到的网络缓冲区（socket buffer）。
+4. CPU 利用 DMA 控制器将数据从网络缓冲区（socket buffer）拷贝到网卡进行数据传输。
+5. 上下文从内核态（kernel space）切换回用户态（user space），sendfile 系统调用执行返回。
+
+**相比较于 mmap 内存映射的方式，sendfile 少了 2 次上下文切换，但是仍然有 1 次 CPU 拷贝操作**。
+
+* sendfile 存在的问题：是用户程序不能对数据进行修改，而只是单纯地完成了一次数据传输过程。
+
 #### Linux-sendfile + DMA gather copy
 
+Linux 2.4 版本的内核对 sendfile 系统调用进行修改，为 DMA 拷贝引入了 gather 操作。它将**内核空间（kernel space）的读缓冲区（read buffer）中对应的数据描述信息（内存地址、地址偏移量）记录到相应的网络缓冲区（ socket buffer）中，由 DMA 根据内存地址、地址偏移量将数据批量地从读缓冲区（read buffer）拷贝到网卡设备中，这样就省去了内核空间中仅剩的 1 次 CPU 拷贝操作**，sendfile 的伪代码如下：
+
+```cpp
+sendfile(socket_fd, file_fd, len);
+```
+
+**在硬件的支持下，sendfile 拷贝方式不再从内核缓冲区的数据拷贝到 socket 缓冲区，取而代之的仅仅是缓冲区文件描述符和数据长度的拷贝，这样 DMA 引擎直接利用 gather 操作将页缓存中数据打包发送到网络中即可，本质就是和虚拟内存映射的思路类似**。
+
+<img src="https://github.com/craftlook/Note/blob/master/image/io/sendfile-gather-io.png" width="80%" heigth="60%"/>
+
+基于 sendfile + DMA gather copy 系统调用的零拷贝方式，整个拷贝过程会发生 **2 次上下文切换、0 次 CPU 拷贝以及 2 次 DMA 拷贝**，用户程序读写数据的流程如下：
+
+1. 用户进程通过 sendfile() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
+2. CPU 利用 DMA 控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
+3. CPU 把读缓冲区（read buffer）的文件描述符（file descriptor）和数据长度拷贝到网络缓冲区（socket buffer）。
+4. 基于已拷贝的文件描述符（file descriptor）和数据长度，CPU 利用 DMA 控制器的 gather/scatter 操作直接批量地将数据从内核的读缓冲区（read buffer）拷贝到网卡进行数据传输。
+5. 上下文从内核态（kernel space）切换回用户态（user space），sendfile 系统调用执行返回。
+
+**sendfile + DMA gather copy 拷贝方式问题**：同样存在用户程序不能对数据进行修改的问题，而且本身需要硬件的支持，它只适用于将数据从文件拷贝到 socket 套接字上的传输过程。
+
 #### Linux-splice
+
+sendfile 只适用于将数据从文件拷贝到 socket 套接字上，同时需要硬件的支持，这也限定了它的使用范围。Linux 在 2.6.17 版本引入 splice 系统调用，不仅不需要硬件支持，还实现了两个文件描述符之间的数据零拷贝。splice 的伪代码如下：
+
+```cpp
+splice(fd_in, off_in, fd_out, off_out, len, flags);
+```
+
+splice 系统调用可以在**内核空间的读缓冲区（read buffer）和网络缓冲区（socket buffer）之间建立管道（pipeline），从而避免了两者之间的 CPU 拷贝操作**。
+
+<img src="https://github.com/craftlook/Note/blob/master/image/io/splice-io.png" width="80%" heigth="60%"/>
+
+基于 splice 系统调用的零拷贝方式，整个拷贝过程会发生** 2 次上下文切换，0 次 CPU 拷贝以及 2 次 DMA 拷贝**，用户程序读写数据的流程如下：
+
+1. 用户进程通过 splice() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
+2. CPU 利用 DMA 控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
+3. CPU 在内核空间的读缓冲区（read buffer）和网络缓冲区（socket buffer）之间建立管道（pipeline）。
+4. CPU 利用 DMA 控制器将数据从网络缓冲区（socket buffer）拷贝到网卡进行数据传输。
+5. 上下文从内核态（kernel space）切换回用户态（user space），splice 系统调用执行返回。
+
+**splice 拷贝方式问题**：同样存在用户程序不能对数据进行修改的问题。除此之外，它使用了 Linux 的管道缓冲机制，可以用于任意两个文件描述符中传输数据，但是它的两个文件描述符参数中有一个必须是管道设备。
+
+#### 写时复制
+
+在某些情况下，内核缓冲区可能被多个进程所共享，如果某个进程想要这个共享区进行 write 操作，由于 write 不提供任何的锁操作，那么就会对共享区中的数据造成破坏，写时复制的引入就是 Linux 用来保护数据的。
+
+**写时复制指的是当多个进程共享同一块数据时，如果其中一个进程需要对这份数据进行修改，那么就需要将其拷贝到自己的进程地址空间中。这样做并不影响其他进程对这块数据的操作，每个进程要修改的时候才会进行拷贝，所以叫写时拷贝。这种方法在某种程度上能够降低系统开销，如果某个进程永远不会对所访问的数据进行更改，那么也就永远不需要拷贝**。
+
+#### 缓冲区共享
+
+缓冲区共享方式完全改写了传统的 I/O 操作，因为传统 I/O 接口都是基于数据拷贝进行的，要避免拷贝就得去掉原先的那套接口并重新改写，所以这种方法是比较全面的零拷贝技术，目前比较成熟的一个方案是在 Solaris 上实现的 fbuf（Fast Buffer，快速缓冲区）。
+
+**fbuf 的思想**是每个进程都维护着一个缓冲区池，这个缓冲区池能被同时映射到用户空间（user space）和内核态（kernel space），内核和用户共享这个缓冲区池，这样就避免了一系列的拷贝操作。
+
+<img src="https://github.com/craftlook/Note/blob/master/image/io/write-io-copy.png" width="80%" heigth="60%"/>
+
+缓冲区共享的难度在于管理共享缓冲区池需要应用程序、网络软件以及设备驱动程序之间的紧密合作，而且如何改写 API 目前还处于试验阶段并不成熟。
 
 #### Linux 零拷贝对比
 
