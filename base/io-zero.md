@@ -53,8 +53,7 @@
 页表（Page Table）可以简单的理解为单个内存映射（Memory Mapping）的链表（当然实际结构很复杂），里面的每个内存映射（Memory Mapping）都将一块虚拟地址映射到一个特定的地址空间（物理内存或者磁盘存储空间）。每个进程拥有自己的页表（Page Table），和其它进程的页表（Page Table）没有关系。
 
 **虚拟内存和物理内存就是通过这个页表实现地址空间的映射的**。下面给出两个进程 A、B 各自的虚拟内存空间以及对应的物理内存之间的地址映射示意图：
-
-![Alt](https://github.com/craftlook/Note/blob/master/image/io/addr.png =100x)
+<img src="https://github.com/craftlook/Note/blob/master/image/io/addr.png" width="80%" heigth="60%"/>
 
 当进程执行一个程序时，需要先从先内存中读取该进程的指令，然后执行，获取指令时用到的就是虚拟地址。这个虚拟地址是程序链接时确定的（内核加载并初始化进程时会调整动态库的地址范围）。为了获取到实际的数据，CPU 需要将虚拟地址转换成物理地址，CPU 转换地址时需要用到进程的页表（Page Table），而页表（Page Table）里面的数据由操作系统维护。
 
@@ -136,7 +135,6 @@ Linux 提供了**轮询、I/O 中断以及 DMA **传输这 3 种磁盘与主存�
 
 在 DMA 技术出现之前，应用程序与磁盘之间的 I/O 操作都是通过 CPU 的中断完成的。每次用户进程读取磁盘数据时，都需要 CPU 中断，然后发起 I/O 请求等待数据读取和拷贝完成，每次的 I/O 中断都导致 CPU 的上下文切换。
 <img src="https://github.com/craftlook/Note/blob/master/image/io/read-liucheng.png" width="80%" heigth="60%"/>
-![avatar](https://github.com/craftlook/Note/blob/master/image/io/read-liucheng.png)
 
 ### DMA传输原理
 
