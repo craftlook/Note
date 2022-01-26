@@ -1,4 +1,4 @@
-  * [1. 内存分类](#1-内存分类)
+  * [1. 内存分类。](#1-内存分类。)
     * [1.1 物理内存](#11-物理内存)
     * [1.2 虚拟内存](#12-虚拟内存)
     * [1.3 页表](#13-页表)
@@ -26,17 +26,19 @@
       * [5.2.7 缓冲区共享](#527-缓冲区共享)
       * [5.2.8 Linux 零拷贝对比](#528-linux-零拷贝对比)
   * [6. Java NIO 零拷贝](#6-java-nio-零拷贝)
+    * [6.1 MappedByteBuffer写文件数据：](#61-mappedbytebuffer写文件数据：)
+    * [6.2 DirectByteBuffer](#62-directbytebuffer)
+    * [6.3 FileChannel](#63-filechannel)
   * [7. 其它的零拷贝实现](#7-其它的零拷贝实现)
     * [7.1 Netty零拷贝](#71-netty零拷贝)
     * [7.2 RocketMQ和Kafka对比](#72-rocketmq和kafka对比)
 
 
+
 [TOC] 
 
 
-
-
-## 1. 内存分类
+## 1. 内存分类。
 
 ### 1.1 物理内存
 
@@ -332,13 +334,15 @@ splice 系统调用可以在**内核空间的读缓冲区（read buffer）和网
 
 <img src="https://github.com/craftlook/Note/blob/master/image/io/splice-io.png" width="80%" heigth="60%"/>
 
-基于 splice 系统调用的零拷贝方式，整个拷贝过程会发生** 2 次上下文切换，0 次 CPU 拷贝以及 2 次 DMA 拷贝**，用户程序读写数据的流程如下：
+基于 splice 系统调用的零拷贝方式，整个拷贝过程会发生**2 次上下文切换，0 次 CPU 拷贝以及 2 次 DMA 拷贝**，用户程序读写数据的流程如下：
 
 1. 用户进程通过 splice() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
-2. CPU 利用 DMA 控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
-3. CPU 在内核空间的读缓冲区（read buffer）和网络缓冲区（socket buffer）之间建立管道（pipeline）。
-4. CPU 利用 DMA 控制器将数据从网络缓冲区（socket buffer）拷贝到网卡进行数据传输。
-5. 上下文从内核态（kernel space）切换回用户态（user space），splice 系统调用执行返回。
+
+CPU 利用 DMA 控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
+
+1. CPU 在内核空间的读缓冲区（read buffer）和网络缓冲区（socket buffer）之间建立管道（pipeline）。
+2. CPU 利用 DMA 控制器将数据从网络缓冲区（socket buffer）拷贝到网卡进行数据传输。
+3. 上下文从内核态（kernel space）切换回用户态（user space），splice 系统调用执行返回。
 
 **splice 拷贝方式问题**：同样存在用户程序不能对数据进行修改的问题。除此之外，它使用了 Linux 的管道缓冲机制，可以用于任意两个文件描述符中传输数据，但是它的两个文件描述符参数中有一个必须是管道设备。
 
@@ -362,19 +366,55 @@ splice 系统调用可以在**内核空间的读缓冲区（read buffer）和网
 
 无论是传统 I/O 拷贝方式还是引入零拷贝的方式，2 次 DMA Copy 是都少不了的，因为两次 DMA 都是依赖硬件完成的。下面从 CPU 拷贝次数、DMA 拷贝次数以及系统调用几个方面总结一下上述几种 I/O 拷贝方式的差别。
 
-| 拷贝方式                 | 系统调用   | CPU拷贝 | DMA拷贝 | 上下文切换 |
-| ------------------------ | ---------- | ------- | ------- | ---------- |
-| 传统I/O（read+write）    | read+write | 2       | 2       | 4          |
-| 内存映射（mmap+write）   | mmap+write | 1       | 2       | 4          |
-| sendfile                 | sendfile   | 1       | 2       | 2          |
-| sendfile+DMA gather copy | sendfile   | 1       | 2       | 2          |
-| splice                   | splice     | 0       | 2       | 2          |
+| 拷贝方式                 | 系统调用   | CPU拷贝 | DMA拷贝 | 上下文切换 | 备注                                                         |
+| ------------------------ | ---------- | ------- | ------- | ---------- | ------------------------------------------------------------ |
+| 传统I/O（read+write）    | read+write | 2       | 2       | 4          |                                                              |
+| 内存映射（mmap+write）   | mmap+write | 1       | 2       | 4          | **当 mmap 一个文件时，如果这个文件被另一个进程所截获**，那么 write 系统调用会因为访问非法地址被 SIGBUS 信号终止，**SIGBUS 默认会杀死进程并产生一个 coredump，服务器可能因此被终止**。 |
+| sendfile                 | sendfile   | 1       | 2       | 2          | 是用户程序不能对数据进行修改，而只是单纯地完成了一次数据传输过程 |
+| sendfile+DMA gather copy | sendfile   | 1       | 2       | 2          | 同样存在用户程序不能对数据进行修改的问题，而且本身需要硬件的支持，它只适用于将数据从文件拷贝到 socket 套接字上的传输过程。 |
+| splice                   | splice     | 0       | 2       | 2          | 同样存在用户程序不能对数据进行修改的问题。它使用了 Linux 的管道缓冲机制，可以用于任意两个文件描述符中传输数据，但是它的两个文件描述符参数中有一个必须是管道设备 |
 
 
 
 ## 6. Java NIO 零拷贝
 
+在 Java NIO 中的**通道（Channel）**就相当于操作系统的**内核空间（kernel space）的缓冲区**，而**缓冲区（Buffer）**对应的相当于操作系统的**用户空间（user space）中的用户缓冲区（user buffer）**。
 
+- 通道（Channel）是全双工的（双向传输），它既可能是读缓冲区（read buffer），也可能是网络缓冲区（socket buffer）。
+- 缓冲区（Buffer）分为堆内存（HeapBuffer）和堆外内存（DirectBuffer），这是通过 malloc() 分配出来的用户态内存。
+
+堆外内存（DirectBuffer）在使用后需要应用程序手动回收，而堆内存（HeapBuffer）的数据在 GC 时可能会被自动回收。因此，在使用 HeapBuffer 读写数据时，为了避免缓冲区数据因为 GC 而丢失，NIO 会先把 HeapBuffer 内部的数据拷贝到一个临时的 DirectBuffer 中的本地内存（native memory），这个拷贝涉及到 sun.misc.Unsafe.copyMemory() 的调用，背后的实现原理与 memcpy() 类似。 最后，将临时生成的 DirectBuffer 内部的数据的内存地址传给 I/O 调用函数，这样就避免了再去访问 Java 对象处理 I/O 读写。
+
+### 6.1 MappedByteBuffer写文件数据：
+
+打开文件通道 fileChannel 并提供读权限、写权限和数据清空权限，通过 fileChannel 映射到一个可写的内存缓冲区 mappedByteBuffer，将目标数据写入 mappedByteBuffer，通过 force() 方法把缓冲区更改的内容强制写入本地文件。
+
+MappedByteBuffer 是 NIO 基于内存映射（mmap）这种零拷贝方式的提供的一种实现，它继承自 ByteBuffer。FileChannel 定义了一个 map() 方法，它可以把一个文件从 position 位置开始的 size 大小的区域映射为内存映像文件。
+
+MappedByteBuffer 相比 ByteBuffer 新增了 fore()、load() 和 isLoad() 三个重要的方法：
+
+- fore()：对于处于 READ_WRITE 模式下的缓冲区，把对缓冲区内容的修改强制刷新到本地文件。
+- load()：将缓冲区的内容载入物理内存中，并返回这个缓冲区的引用。
+- isLoaded()：如果缓冲区的内容在物理内存中，则返回 true，否则返回 false。
+
+读与写：
+
+* 写文件数据：打开文件通道 fileChannel 并提供读权限、写权限和数据清空权限，通过 fileChannel 映射到一个可写的内存缓冲区 mappedByteBuffer，将目标数据写入 mappedByteBuffer，通过 force() 方法把缓冲区更改的内容强制写入本地文件。
+* 读文件数据：打开文件通道 fileChannel 并提供只读权限，通过 fileChannel 映射到一个只可读的内存缓冲区 mappedByteBuffer，读取 mappedByteBuffer 中的字节数组即可得到文件数据。
+
+### 6.2 DirectByteBuffer
+
+DirectByteBuffer 的对象引用位于 Java 内存模型的堆里面，JVM 可以对 DirectByteBuffer 的对象进行内存分配和回收管理，一般使用 DirectByteBuffer 的静态方法 allocateDirect() 创建 DirectByteBuffer 实例并分配内存。
+
+DirectByteBuffer 内部的字节缓冲区位在于堆外的（用户态）直接内存，它是通过 Unsafe 的本地方法 allocateMemory() 进行内存分配，底层调用的是操作系统的 malloc() 函数。
+
+由于使用 DirectByteBuffer 分配的是系统本地的内存，不在 JVM 的管控范围之内，因此直接内存的回收和堆内存的回收不同，直接内存如果使用不当，很容易造成 OutOfMemoryError。
+
+DirectByteBuffer 是 MappedByteBuffer 的具体实现类。实际上，Util.newMappedByteBuffer() 方法通过反射机制获取 DirectByteBuffer 的构造器，然后创建一个 DirectByteBuffer 的实例，对应的是一个单独用于内存映射的构造方法：因此，除了允许分配操作系统的直接内存以外，DirectByteBuffer 本身也具有文件内存映射的功能，这里不做过多说明。我们需要关注的是，DirectByteBuffer 在 MappedByteBuffer 的基础上提供了内存映像文件的随机读取 get() 和写入 write() 的操作。
+
+### 6.3 FileChannel
+
+FileChannel 是一个用于文件读写、映射和操作的通道，同时它在并发环境下是线程安全的，基于 FileInputStream、FileOutputStream 或者 RandomAccessFile 的 getChannel() 方法可以创建并打开一个文件通道。FileChannel 定义了 transferFrom() 和 transferTo() 两个抽象方法，它通过在通道和通道之间建立连接实现数据传输的。
 
 ## 7. 其它的零拷贝实现
 
