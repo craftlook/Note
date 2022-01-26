@@ -18,6 +18,7 @@
 * [MySQL-两阶段提交](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-twocommit.md)
 * [MySQL-半同步介绍](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-semi.md)
 * [MySQL-日志文件简介](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-log.md)
+* [MySQL-更新语句执行流程](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-update.md)
 
 ### ES相关
  * [ES 组合查询语句介绍](https://github.com/craftlook/Note/tree/master/es/statement.md)
