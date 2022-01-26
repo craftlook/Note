@@ -3,4 +3,4 @@
 
 ## Mysql 语句更新过程
 
-<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-update.png" weight="80%" height="80%"/>
+<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-update.png" weight="90%" height="90%"/>
