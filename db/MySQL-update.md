@@ -225,11 +225,11 @@ change buffer, 实际上此操作也是可以持久化的数据。将change buff
 
 1. **prepare阶段**：redo持久化到磁盘（redo group commit），并将回滚段置为prepared状态，此时binlog不做操作。
 
-<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-prepare.png" width="80%" heigth="80%"/>
+<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-prepare.png" width="50%" heigth="50%"/>
 
 2. **commit阶段**：innodb释放锁，释放回滚段，设置提交状态，binlog持久化到磁盘，然后存储引擎层提交。
 
-<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-commit.png" width="80%" heigth="80%"/>
+<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-commit.png" width="50%" heigth="50%"/>
 
 > 问题：为什么需要二阶段提交？
 
@@ -240,7 +240,7 @@ change buffer, 实际上此操作也是可以持久化的数据。将change buff
 
 > 问题：二阶段提交怎么解决问题？
 
-<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-liu.png" width="40%" heigth="40%"/>
+<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-liu.png" width="40%" heigth="30%"/>
 
 
 > 上图的①时出现问题怎么解决？
