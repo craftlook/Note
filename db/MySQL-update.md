@@ -240,7 +240,7 @@ change buffer, 实际上此操作也是可以持久化的数据。将change buff
 
 > 问题：二阶段提交怎么解决问题？
 
-<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-liu.png" width="80%" heigth="70%"/>
+<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-liu.png" width="40%" heigth="40%"/>
 
 
 > 上图的①时出现问题怎么解决？
