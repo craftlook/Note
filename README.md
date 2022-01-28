@@ -19,7 +19,7 @@
 * [MySQL-半同步介绍](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-semi.md)
 * [MySQL-日志文件简介](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-log.md)
 * [MySQL-更新语句执行流程](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-update.md)
-* [MySQL半同步延迟导致数据不一致-线上问题](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-question-1.md)
+* [MySQL-线上问题：半同步延迟导致数据不一致](https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/db/MySQL-question-1.md)
 ### ES相关
  * [ES 组合查询语句介绍](https://github.com/craftlook/Note/tree/master/es/statement.md)
  * [range 查询原理](https://github.com/craftlook/Note/tree/master/es/range.md)
