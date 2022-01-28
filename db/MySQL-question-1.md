@@ -56,7 +56,7 @@
 
 对流程结构不合理的配置进行调整：
 
-<img src="https://github.com/craftlook/Note/blob/master/image/db/mysql-2pc-prepare.png" width="80%" heigth="80%">
+<img src="https://github.com/craftlook/Note/blob/master/image/db/Mysql-question-1-answer.png" width="80%" heigth="80%">
 
 **流程改进**：Binlake同步转发服务对接readOnly的从库消息，Binlog同步服务应用进行binlog消息的延迟消费。（通过减缓binlog的消息消费速度，尽量避免半同步ACK延迟的问题）
 
