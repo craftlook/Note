@@ -56,7 +56,7 @@ Dubbo 的服务注册中心：ZooKeeper，基于 ZooKeeper 的注册中心有一
 
 **缺点**：内部实现非常复杂，ZooKeeper 是基于 CP 模型（强一致性），系统架构在选择使用时需要牺牲可用性。eg:如果 ZooKeeper 集群触发重新选举或网络分区，此时整个 ZooKeeper 集群将无法提供新的注册与订阅服务，影响用户的使用。
 
-### PUSH 模式
+### PULL 模式
 
 <img src="https://github.com/craftlook/Note/blob/master/image/discovery/rocketMq-p-b-1.png" width="80%" heigth="70%"/>
 
