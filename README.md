@@ -41,7 +41,7 @@
  * [Eureka]()
  * [Consul]()
  * [Nacos]()
- * [rocketMQ-NameServer]()
+ * [rocketMQ-NameServer](https://github.com/craftlook/Note/blob/master/server/discovery/rocketmq-nameserver.md)
  * [ES-Zen-discovery]()
 
 ## LightHouse
