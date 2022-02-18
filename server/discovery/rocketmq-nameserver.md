@@ -7,8 +7,8 @@
     * [PUSH模式](#push模式)
     * [PUSH 模式](#push-模式)
     * [Nameserver 数据不一致影响分析](#nameserver-数据不一致影响分析)
-      * [**对消息发送端的影响：**](#对消息发送端的影响：)
-      * [**对消息消费端的影响：**](#对消息消费端的影响：)
+      * [**对消息发送端的影响**](#对消息发送端的影响)
+      * [**对消息消费端的影响**](#对消息消费端的影响)
 
 [toc]
 
@@ -80,11 +80,11 @@ RocketMQ 中的消息发送者、消息消费者在同一时间只会连接到 N
 
 <img src="https://github.com/craftlook/Note/blob/master/image/discovery/rocketMq-p-c-m.png" width="80%" heigth="70%"/>
 
-#### **对消息发送端的影响：**
+#### **对消息发送端的影响**
 
 正如上图所示，Producer-A 连接 Nameserver-1，而 Producer-B 连接 Nameserver-2，例如这个两个消息发送者都需要发送消息到主题 order_topic。**由于 Nameserver 中存储的路由信息不一致，对消息发送的影响不大，只是会造成消息分布不均衡**，会导致消息大部分会发送到 broker-a 上，**只要不出现网络分区的情况，Nameserver 中的数据会最终达到一致**，数据不均衡问题会很快得到解决。故从消息发送端来看，Nameserver 中路由数据的不一致性并不会产生严重的问题。
 
-#### **对消息消费端的影响：**
+#### **对消息消费端的影响**
 
 如果一个消费组 order_consumer 中有两个消费者 consumer-a、consumer-b(以下简称 c-a、c-b)，同样由于 c-a、c-b 连接的 Nameserver 不同，两者得到的路由信息会不一致，会出现什么问题呢？我们知道，在 RocketMQ PUSH 模式下会自动进行消息消费队列的负载均衡，我们以平均分配算法为例，来看一下队列的负载情况。
 
