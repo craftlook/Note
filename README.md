@@ -33,10 +33,10 @@
    * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/algorithm/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91B%E6%A0%91B%2B%E6%A0%91.md">查询二叉树、平衡二叉树、B树、B+树、B\*树</a>
  * [跳表](https://github.com/craftlook/Note/blob/master/algorithm/skiplist.md)
  * [LSM树](https://github.com/craftlook/Note/blob/master/algorithm/lsm.md)
+ * [共识性算法-paxos](https://github.com/craftlook/Note/blob/master/algorithm/paxos.md)
 ### 算法题
  * <a href="https://github.com/craftlook/Hello-World/blob/craftlook-Hello-World/leeCode/menu.md">leeCode目录</a>
 ### 服务注册与发现
- * [注册中心算法]()
  * [zookeeper]()
  * [Eureka]()
  * [Consul]()
