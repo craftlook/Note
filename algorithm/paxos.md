@@ -39,7 +39,8 @@ Paxos 算法包括两个阶段（Learn 阶段之前决议已经形成）：
 
 * 第三阶段：Learn 阶段。Proposer 在收到多数 Acceptors 的 Accept 之后，标志着本次 Accept 成功，决议形成，将形成的决议发送给所有 Learners。
 
-<img src="https://github.com/craftlook/Note/tree/master/image/paxos/paxosq.png" heigth="70%" width="70%">
+<img src="https://github.com/craftlook/Note/tree/master/image/paxos/paxosq.png" width="70%" heigth="70%" >
+<img src="https://github.com/craftlook/Note/blob/master/image/db/Mysql-question-1.png" width="80%" heigth="80%">
 
 ### 工作实例
 
