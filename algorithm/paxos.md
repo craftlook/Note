@@ -48,7 +48,6 @@ Paxos 算法包括两个阶段（Learn 阶段之前决议已经形成）：
 * 情况一：S1选定的(提案 ID) P 是 3.1（全局唯一 ID 加上节点编号），先取得了多数派决策节点的 Promise 和 Accepted 应答，此时 S5选定(提案 ID) P 是 4.5，发起 Prepare 请求，收到的多数派应答中至少会包含 1 个此前应答过 S1的决策节点，假设是 S3，那么 S3提供的 Promise 中必将包含 S1已设定好的值 X，S5就必须无条件地用 X 代替 Y 作为自己提案的值，由此整个系统对“取值为 X”这个事实达成一致。
 
   <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos1.png" heigth="70%" width="70%"/>
-
   <center>整个系统对“取值为 X”达成一致</center>
 
 * 情况二：对于情况一，X 被选定为最终值是必然结果，但从上图中可以看出，X 被选定为最终值并不是必定需要多数派的共同批准，只取决于 S5提案时 Promise 应答中是否已包含了批准过 X 的决策节点，譬如图 所示，S5发起提案的 Prepare 请求时，X 并未获得多数派批准，但由于 S3已经批准的关系，最终共识的结果仍然是 X。
