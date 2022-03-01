@@ -39,7 +39,7 @@ Paxos 算法包括两个阶段（Learn 阶段之前决议已经形成）：
 
 * 第三阶段：Learn 阶段。Proposer 在收到多数 Acceptors 的 Accept 之后，标志着本次 Accept 成功，决议形成，将形成的决议发送给所有 Learners。
 
-<img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxosq.png" width="80%" heigth="80%" >
+<div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxosq.png" width="80%" heigth="80%" ></div>
 
 ### 工作实例
 
@@ -54,21 +54,21 @@ Paxos 算法包括两个阶段（Learn 阶段之前决议已经形成）：
 
 * 情况二：对于情况一，X 被选定为最终值是必然结果，但从上图中可以看出，X 被选定为最终值并不是必定需要多数派的共同批准，只取决于 S5提案时 Promise 应答中是否已包含了批准过 X 的决策节点，譬如图 所示，S5发起提案的 Prepare 请求时，X 并未获得多数派批准，但由于 S3已经批准的关系，最终共识的结果仍然是 X。
 
-  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos2.png" heigth="70%" width="70%"/>
+  <div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos2.png" heigth="70%" width="70%"/></div>
 
-  <center>X 被选定只取决于 Promise 应答中是否已批准</center>
+  <div align="center">X 被选定只取决于 Promise 应答中是否已批准</center></div>
 
 * 情况三：另外一种可能的结果是 S5提案时 Promise 应答中并未包含批准过 X 的决策节点，譬如应答 S5提案时，节点 S1已经批准了 X，节点 S2、S3未批准但返回了 Promise 应答，此时 S5以更大的提案 ID 获得了 S3、S4、S5的 Promise，这三个节点均未批准过任何值，那么 S3将不会再接收来自 S1的 Accept 请求，因为它的提案 ID 已经不是最大的了，这三个节点将批准 Y 的取值，整个系统最终会对“取值为 Y”达成一致，如图所示
 
-  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos3.png" heigth="70%" width="70%"/>
+  <div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos3.png" heigth="70%" width="70%"/></div>
 
-  <center>整个系统最终会对“取值为 Y”达成一致</center>
+  <div align="center">整个系统最终会对“取值为 Y”达成一致</div>
 
 * 情况四：从情况三可以推导出另一种极端的情况，如果两个提案节点交替使用更大的提案 ID 使得准备阶段成功，但是批准阶段失败的话，这个过程理论上可以无限持续下去，形成活锁（Live Lock），如图所示。在算法实现中会引入随机超时时间来避免活锁的产生。
 
-  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos4.png" heigth="70%" width="70%"/>
+  <div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos4.png" heigth="70%" width="70%"/></div>
 
-  <center>批准阶段失败，形成活锁</center>
+  <div align="center">批准阶段失败，形成活锁</div>
 
 **总结**：Basic Paxos 只能对单个值形成决议，并且决议的形成至少需要两次网络请求和应答（准备和批准阶段各一次），高并发情况下将产生较大的网络开销，极端情况下甚至可能形成活锁。Basic Paxos 是一种很学术化但对工业化并不友好的算法，现在几乎只用来做理论研究。实际的应用都是基于**Multi Paxos 和 Fast Paxos ** 算法的。
 
