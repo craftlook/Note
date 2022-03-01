@@ -47,25 +47,25 @@ Paxos 算法包括两个阶段（Learn 阶段之前决议已经形成）：
 
 * 情况一：S1选定的(提案 ID) P 是 3.1（全局唯一 ID 加上节点编号），先取得了多数派决策节点的 Promise 和 Accepted 应答，此时 S5选定(提案 ID) P 是 4.5，发起 Prepare 请求，收到的多数派应答中至少会包含 1 个此前应答过 S1的决策节点，假设是 S3，那么 S3提供的 Promise 中必将包含 S1已设定好的值 X，S5就必须无条件地用 X 代替 Y 作为自己提案的值，由此整个系统对“取值为 X”这个事实达成一致。
 
-  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxosq.png" heigth="70%" width="70%"/>
+  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos1.png" heigth="70%" width="70%"/>
 
   <center>整个系统对“取值为 X”达成一致</center>
 
 * 情况二：对于情况一，X 被选定为最终值是必然结果，但从上图中可以看出，X 被选定为最终值并不是必定需要多数派的共同批准，只取决于 S5提案时 Promise 应答中是否已包含了批准过 X 的决策节点，譬如图 所示，S5发起提案的 Prepare 请求时，X 并未获得多数派批准，但由于 S3已经批准的关系，最终共识的结果仍然是 X。
 
-  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos1.png" heigth="70%" width="70%"/>
+  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos2.png" heigth="70%" width="70%"/>
 
   <center>X 被选定只取决于 Promise 应答中是否已批准</center>
 
 * 情况三：另外一种可能的结果是 S5提案时 Promise 应答中并未包含批准过 X 的决策节点，譬如应答 S5提案时，节点 S1已经批准了 X，节点 S2、S3未批准但返回了 Promise 应答，此时 S5以更大的提案 ID 获得了 S3、S4、S5的 Promise，这三个节点均未批准过任何值，那么 S3将不会再接收来自 S1的 Accept 请求，因为它的提案 ID 已经不是最大的了，这三个节点将批准 Y 的取值，整个系统最终会对“取值为 Y”达成一致，如图所示
 
-  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos2.png" heigth="70%" width="70%"/>
+  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos3.png" heigth="70%" width="70%"/>
 
   <center>整个系统最终会对“取值为 Y”达成一致</center>
 
 * 情况四：从情况三可以推导出另一种极端的情况，如果两个提案节点交替使用更大的提案 ID 使得准备阶段成功，但是批准阶段失败的话，这个过程理论上可以无限持续下去，形成活锁（Live Lock），如图所示。在算法实现中会引入随机超时时间来避免活锁的产生。
 
-  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos2.png" heigth="70%" width="70%"/>
+  <img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxos4.png" heigth="70%" width="70%"/>
 
   <center>批准阶段失败，形成活锁</center>
 
