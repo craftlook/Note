@@ -98,6 +98,99 @@ Chubby 和 Boxwood 均使用 Multi Paxos。ZooKeeper 使用的 Zab 也是 Multi 
 
 ## Paxos 推导过程
 
+### 最简单的方案——只有一个Acceptor
+
+假设只有一个Acceptor（可以有多个Proposer），只要Acceptor接受它收到的第一个提案，则该提案被选定，该提案里的value就是被选定的value。这样就保证只有一个value会被选定。
+
+但是，如果这个唯一的Acceptor宕机了，那么整个系统就**无法工作**了！
+
+因此，必须要有**多个Acceptor**！
+<div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxost1.png" heigth="70%" width="70%"/></div>
+
+### 多个Acceptor
+
+多个Acceptor的情况如下图。那么，如何保证在多个Proposer和多个Acceptor的情况下选定一个value呢？
+
+<div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxost2.png" heigth="70%" width="70%"/></div>
+下面开始寻找解决方案。
+
+如果我们希望即使只有一个Proposer提出了一个value，该value也最终被选定。
+
+那么，就得到下面的约束：
+
+> P1：一个Acceptor必须接受它收到的第一个提案。
+
+但是，这又会引出另一个问题：如果每个Proposer分别提出不同的value，发给不同的Acceptor。根据P1，Acceptor分别接受自己收到的value，就导致不同的value被选定。出现了不一致。如下图：
+<div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxost3.png" heigth="70%" width="70%"/></div>
+刚刚是因为『一个提案只要被一个Acceptor接受，则该提案的value就被选定了』才导致了出现上面不一致的问题。因此，我们需要加一个规定：
+
+> 规定：一个提案被选定需要被**半数以上**的Acceptor接受
+
+这个规定又暗示了：『一个Acceptor必须能够接受不止一个提案！』不然可能导致最终没有value被选定。比如上图的情况。v1、v2、v3都没有被选定，因为它们都只被一个Acceptor的接受。
+
+最开始讲的『**提案=value**』已经不能满足需求了，于是重新设计提案，给每个提案加上一个提案编号，表示提案被提出的顺序。令『**提案=提案编号+value**』。
+
+虽然允许多个提案被选定，但必须保证所有被选定的提案都具有相同的value值。否则又会出现不一致。
+
+于是有了下面的约束：
+
+> P2：如果某个value为v的提案被选定了，那么每个编号更高的被选定提案的value必须也是v。
+
+一个提案只有被Acceptor接受才可能被选定，因此我们可以把P2约束改写成对Acceptor接受的提案的约束P2a。
+
+> P2a：如果某个value为v的提案被选定了，那么每个编号更高的被Acceptor接受的提案的value必须也是v。
+
+只要满足了P2a，就能满足P2。
+
+但是，考虑如下的情况：假设总的有5个Acceptor。Proposer2提出[M1,V1]的提案，Acceptor25（半数以上）均接受了该提案，于是对于Acceptor25和Proposer2来讲，它们都认为V1被选定。Acceptor1刚刚从宕机状态恢复过来（之前Acceptor1没有收到过任何提案），此时Proposer1向Acceptor1发送了[M2,V2]的提案（V2≠V1且M2>M1），对于Acceptor1来讲，这是它收到的第一个提案。根据P1（一个Acceptor必须接受它收到的第一个提案。）,Acceptor1必须接受该提案！同时Acceptor1认为V2被选定。这就出现了两个问题：
+
+1. Acceptor1认为V2被选定，Acceptor2~5和Proposer2认为V1被选定。出现了不一致。
+2. V1被选定了，但是编号更高的被Acceptor1接受的提案[M2,V2]的value为V2，且V2≠V1。这就跟P2a（如果某个value为v的提案被选定了，那么每个编号更高的被Acceptor接受的提案的value必须也是v）矛盾了。
+
+<div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxost4.png" heigth="70%" width="70%"/></div>
+
+所以我们要对P2a约束进行强化！
+
+P2a是对Acceptor接受的提案约束，但其实提案是Proposer提出来的，所有我们可以对Proposer提出的提案进行约束。得到P2b：
+
+P2b：如果某个value为v的提案被选定了，那么之后任何Proposer提出的编号更高的提案的value必须也是v。
+
+由P2b可以推出P2a进而推出P2。
+
+那么，如何确保在某个value为v的提案被选定后，Proposer提出的编号更高的提案的value都是v呢？
+
+只要满足P2c即可：
+
+P2c：对于任意的N和V，如果提案[N, V]被提出，那么存在一个半数以上的Acceptor组成的集合S，满足以下两个条件中的任意一个：
+
+S中每个Acceptor都没有接受过编号小于N的提案。
+S中Acceptor接受过的最大编号的提案的value为V。
+Proposer生成提案
+为了满足P2b，这里有个比较重要的思想：Proposer生成提案之前，应该先去『学习』已经被选定或者可能被选定的value，然后以该value作为自己提出的提案的value。如果没有value被选定，Proposer才可以自己决定value的值。这样才能达成一致。这个学习的阶段是通过一个『Prepare请求』实现的。
+
+于是我们得到了如下的提案生成算法：
+
+Proposer选择一个新的提案编号N，然后向某个Acceptor集合（半数以上）发送请求，要求该集合中的每个Acceptor做出如下响应（response）。
+(a) 向Proposer承诺保证不再接受任何编号小于N的提案。
+(b) 如果Acceptor已经接受过提案，那么就向Proposer响应已经接受过的编号小于N的最大编号的提案。
+
+我们将该请求称为编号为N的Prepare请求。
+
+如果Proposer收到了半数以上的Acceptor的响应，那么它就可以生成编号为N，Value为V的提案[N,V]。这里的V是所有的响应中编号最大的提案的Value。如果所有的响应中都没有提案，那 么此时V就可以由Proposer自己选择。
+生成提案后，Proposer将该提案发送给半数以上的Acceptor集合，并期望这些Acceptor能接受该提案。我们称该请求为Accept请求。（注意：此时接受Accept请求的Acceptor集合不一定是之前响应Prepare请求的Acceptor集合）
+
+Acceptor接受提案
+Acceptor可以忽略任何请求（包括Prepare请求和Accept请求）而不用担心破坏算法的安全性。因此，我们这里要讨论的是什么时候Acceptor可以响应一个请求。
+
+我们对Acceptor接受提案给出如下约束：
+
+P1a：一个Acceptor只要尚未响应过任何编号大于N的Prepare请求，那么他就可以接受这个编号为N的提案。
+
+如果Acceptor收到一个编号为N的Prepare请求，在此之前它已经响应过编号大于N的Prepare请求。根据P1a，该Acceptor不可能接受编号为N的提案。因此，该Acceptor可以忽略编号为N的Prepare请求。当然，也可以回复一个error，让Proposer尽早知道自己的提案不会被接受。
+
+因此，一个Acceptor只需记住：1. 已接受的编号最大的提案 2. 已响应的请求的最大编号。
+
+<div align="center"><img src="https://github.com/craftlook/Note/blob/master/image/paxos/paxost5.png" heigth="70%" width="70%"/></div>
 
 
 ## 协助记忆总结
