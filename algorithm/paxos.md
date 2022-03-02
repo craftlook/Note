@@ -11,6 +11,8 @@
     * [最简单的方案——只有一个Acceptor](#最简单的方案只有一个acceptor)
     * [多个Acceptor](#多个acceptor)
   * [协助记忆总结](#协助记忆总结)
+
+
 [toc]
 
 ## Basic Paxos
