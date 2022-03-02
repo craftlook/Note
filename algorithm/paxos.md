@@ -1,5 +1,16 @@
 # 共识性算法-paxos
-
+* [共识性算法-paxos](#共识性算法-paxos)
+  * [Basic Paxos](#basic-paxos)
+    * [角色](#角色)
+    * [算法流程](#算法流程)
+    * [工作实例](#工作实例)
+  * [Multi Paxos](#multi-paxos)
+    * [Basic Paxos 的问题](#basic-paxos-的问题)
+    * [Multi Paxos 的改进](#multi-paxos-的改进)
+  * [Paxos 推导过程](#paxos-推导过程)
+    * [最简单的方案——只有一个Acceptor](#最简单的方案只有一个acceptor)
+    * [多个Acceptor](#多个acceptor)
+  * [协助记忆总结](#协助记忆总结)
 [toc]
 
 ## Basic Paxos
